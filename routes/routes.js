@@ -1,16 +1,23 @@
-var pgp = require('pg-promise');
-const cn = 'postgresql://gilli@localhost:5432/exaltedcb';
-var db = pgp(cn);
+const pg = require('pg');
+const db = new pg.Pool({
+    user: 'gilli',
+    host: 'localhost',
+    database: 'exaltedcb',
+    port: '5432'
+});
+
 var appRouter = function (app) {
     app.get("/", function(req, res) {
         res.status(200).send("Welcome to our restful API");
     });
 
     app.get("/user", function (req, res) {
-        db.any('select* from users').then(function(data) {
-            res.json(data);
-        }).catch(function(err) {
-            console.log('ERROR:', err);
+        db.query('select* from users', (err, response) => {
+            if (response) {
+                res.json(response.rows);
+            } else {
+                console.log("ERROR: ", err);
+            }
         });
     });
 }
