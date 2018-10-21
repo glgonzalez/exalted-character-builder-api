@@ -3,7 +3,7 @@ import * as express from 'express';
 import * as logger from 'morgan';
 import * as bodyParser from 'body-parser';
 import * as session from 'express-session';
-import UserRouter from './routes/users';
+import * as routes from './routes';
 
 // Creates and configures an ExpressJS web server.
 class App {
@@ -44,11 +44,18 @@ class App {
     // placeholder route handler
     router.get('/', (req, res, next) => {
       res.json({
-        message: 'Hello World!'
+        message: 'Welcome to the Exalted API'
       });
     });
     this.express.use('/', router);
-    this.express.use('/api/v1/users', UserRouter);
+    this.express.use('/api/v1/abilities', routes.AbilitiesRouter);
+    this.express.use('/api/v1/attributes', routes.AttributeRouter);
+    this.express.use('/api/v1/charms', routes.CharmsRouter);
+    this.express.use('/api/v1/equipment', routes.EquipmentRouter);
+    this.express.use('/api/v1/flaws', routes.FlawsRouter);
+    this.express.use('/api/v1/intimacies', routes.IntimacyRouter);
+    this.express.use('/api/v1/merits', routes.MeritRouter);
+    this.express.use('/api/v1/users', routes.UserRouter);
   }
 
 }

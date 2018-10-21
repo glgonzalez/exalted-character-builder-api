@@ -1,0 +1,18 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const abilities_1 = require("./abilities");
+exports.AbilitiesRouter = abilities_1.default;
+const attributes_1 = require("./attributes");
+exports.AttributeRouter = attributes_1.default;
+const charms_1 = require("./charms");
+exports.CharmsRouter = charms_1.default;
+const equipment_1 = require("./equipment");
+exports.EquipmentRouter = equipment_1.default;
+const flaws_1 = require("./flaws");
+exports.FlawsRouter = flaws_1.default;
+const intimacies_1 = require("./intimacies");
+exports.IntimacyRouter = intimacies_1.default;
+const merits_1 = require("./merits");
+exports.MeritRouter = merits_1.default;
+const users_1 = require("./users");
+exports.UserRouter = users_1.default;

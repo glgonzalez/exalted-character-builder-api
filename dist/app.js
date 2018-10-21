@@ -4,7 +4,7 @@ const express = require("express");
 const logger = require("morgan");
 const bodyParser = require("body-parser");
 const session = require("express-session");
-const users_1 = require("./routes/users");
+const routes = require("./routes");
 // Creates and configures an ExpressJS web server.
 class App {
     //Run configuration methods on the Express instance.
@@ -38,11 +38,18 @@ class App {
         // placeholder route handler
         router.get('/', (req, res, next) => {
             res.json({
-                message: 'Hello World!'
+                message: 'Welcome to the Exalted API'
             });
         });
         this.express.use('/', router);
-        this.express.use('/api/v1/users', users_1.default);
+        this.express.use('/api/v1/abilities', routes.AbilitiesRouter);
+        this.express.use('/api/v1/attributes', routes.AttributeRouter);
+        this.express.use('/api/v1/charms', routes.CharmsRouter);
+        this.express.use('/api/v1/equipment', routes.EquipmentRouter);
+        this.express.use('/api/v1/flaws', routes.FlawsRouter);
+        this.express.use('/api/v1/intimacies', routes.IntimacyRouter);
+        this.express.use('/api/v1/merits', routes.MeritRouter);
+        this.express.use('/api/v1/users', routes.UserRouter);
     }
 }
 exports.default = new App().express;
