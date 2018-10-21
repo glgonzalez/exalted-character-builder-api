@@ -10,7 +10,6 @@ class AbilitiesRouter {
     getAbilities(req, res, next) {
         database_1.db.query('select * from abilities', (err, response) => {
             if (response) {
-                // res.json(response.rows);
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
