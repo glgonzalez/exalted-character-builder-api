@@ -13,7 +13,6 @@ export class AttributeRouter {
     db.query(`select attributes.id, attributes.name, attributes.description, attribute_types.type 
     from attributes inner join attribute_types on attributes.type_id = attribute_types.id`, (err, response) => {
       if (response) {
-          // res.json(response.rows);
           res.status(200).send({
             message: 'Success',
             status: res.status,
@@ -31,7 +30,6 @@ export class AttributeRouter {
   public getAttributeTypes(req: Request, res: Response, next: NextFunction) {
     db.query('select * from attribute_types', (err, response) => {
       if (response) {
-        // res.json(response.rows);
         res.status(200).send({
           message: 'Success',
           status: res.status,

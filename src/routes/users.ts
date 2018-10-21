@@ -4,18 +4,11 @@ import { db } from '../config/database';
 export class UserRouter {
   router: Router
 
-
-  /**
-   * Initialize the userRouter
-   */
   constructor() {
     this.router = Router();
     this.init();
   }
 
-  /**
-   * GET all Heroes.
-   */
   public getAll(req: Request, res: Response, next: NextFunction) {
     db.query('select* from users', (err, response) => {
         if (response) {
@@ -45,10 +38,6 @@ export class UserRouter {
 
   }
 
-  /**
-   * Take each handler, and attach to one of the Express.Router's
-   * endpoints.
-   */
   init() {
     this.router.get('/', this.getAll);
     this.router.get('/:id', this.getUserById);
@@ -56,7 +45,6 @@ export class UserRouter {
 
 }
 
-// Create the HeroRouter, and export its configured Express.Router
 const userRoutes = new UserRouter();
 userRoutes.init();
 
