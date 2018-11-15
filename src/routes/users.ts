@@ -10,31 +10,36 @@ export class UserRouter {
     this.init();
   }
 
-  public getAll(req: Request, res: Response, next: NextFunction) {
-    db.query('select* from users', (err, response) => {
-        if (response) {
-            res.json(response.rows);
-        } else {
-            console.log("ERROR: ", err);
-        }
-    });
-  }
-
-  public getUserById(req: Request, res: Response, next: NextFunction) {
-    db.query('select* from users where user_id = ' + req.params.id, (err, response) => {
-        if (response) {
-            res.status(200).send({
-                message: 'Success',
-                status: res.status,
-                user: response.rows[0]
-            });
-        } else {
-            res.status(404).send({
+  public async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const response = await db.query('select* from users');
+        res.status(200).send({
+            message: 'Success',
+            status: res.status,
+            users: response.rows
+        });
+    } catch(err) {
+        res.status(404).send({
             message: err,
             status: res.status
-            });
-        }
-    });
+        });
+    }
+  }
+
+  public async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const response = await db.query('select* from users where user_id = $1', [req.params.id]);
+        res.status(200).send({
+            message: 'Success',
+            status: res.status,
+            user: response.rows[0]
+        });
+    } catch(err) {
+        res.status(404).send({
+            message: err,
+            status: res.status
+        });
+    }
   }
 
   public async addUser(req: Request, res: Response, next: NextFunction): Promise<void> {

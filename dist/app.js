@@ -36,6 +36,7 @@ class App {
         this.express.use('/', router);
         this.express.use('/api/v1/abilities', routes.AbilitiesRouter);
         this.express.use('/api/v1/attributes', routes.AttributeRouter);
+        this.express.use('/api/v1/authentication', routes.AuthRouter);
         this.express.use('/api/v1/charms', routes.CharmsRouter);
         this.express.use('/api/v1/equipment', routes.EquipmentRouter);
         this.express.use('/api/v1/flaws', routes.FlawsRouter);

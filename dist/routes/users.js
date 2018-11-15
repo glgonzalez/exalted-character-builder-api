@@ -17,25 +17,34 @@ class UserRouter {
         this.init();
     }
     getAll(req, res, next) {
-        database_1.db.query('select* from users', (err, response) => {
-            if (response) {
-                res.json(response.rows);
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield database_1.db.query('select* from users');
+                res.status(200).send({
+                    message: 'Success',
+                    status: res.status,
+                    users: response.rows
+                });
             }
-            else {
-                console.log("ERROR: ", err);
+            catch (err) {
+                res.status(404).send({
+                    message: err,
+                    status: res.status
+                });
             }
         });
     }
     getUserById(req, res, next) {
-        database_1.db.query('select* from users where user_id = ' + req.params.id, (err, response) => {
-            if (response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield database_1.db.query('select* from users where user_id = $1', [req.params.id]);
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
                     user: response.rows[0]
                 });
             }
-            else {
+            catch (err) {
                 res.status(404).send({
                     message: err,
                     status: res.status

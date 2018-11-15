@@ -40,5 +40,8 @@ function onError(error: NodeJS.ErrnoException): void {
 function onListening(): void {
   let addr = server.address();
   let bind = (typeof addr === 'string') ? `pipe ${addr}` : `port ${addr.port}`;
+  if(!process.env.JWT_SECRET) {
+    process.env.JWT_SECRET = 'exaltedapisecret';
+  }
   debug(`Listening on ${bind}`);
 }
