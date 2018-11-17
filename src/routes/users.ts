@@ -2,6 +2,8 @@ import { Router, Request, Response, NextFunction } from 'express';
 import * as bcrypt from 'bcrypt';
 import { db } from '../config/database';
 
+import userService from '../services/users';
+
 export class UserRouter {
   router: Router
 
@@ -12,15 +14,16 @@ export class UserRouter {
 
   public async getAll(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const response = await db.query('select* from users');
+        const response = await userService.getAll();
         res.status(200).send({
             message: 'Success',
             status: res.status,
-            users: response.rows
+            users: response
         });
     } catch(err) {
         res.status(404).send({
-            message: err,
+            message: 'Somehting went wrong',
+            error: err,
             status: res.status
         });
     }
@@ -28,15 +31,15 @@ export class UserRouter {
 
   public async getUserById(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const response = await db.query('select* from users where user_id = $1', [req.params.id]);
+        const response = await userService.getUserById(req.params.id);
         res.status(200).send({
             message: 'Success',
             status: res.status,
-            user: response.rows[0]
+            user: response
         });
     } catch(err) {
         res.status(404).send({
-            message: err,
+            message: 'User not found',
             status: res.status
         });
     }
@@ -44,23 +47,16 @@ export class UserRouter {
 
   public async addUser(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-        const saltRounds: number = 10;
-        req.body.password = await bcrypt.hash(req.body.password, saltRounds);
-        await db.query(`insert into users (
-            username,
-            password,
-            email
-        ) values($1, $2, $3)`, [req.body.username, req.body.password, req.body.email]);
+        await userService.addUser(req.body.username, req.body.password, req.body.email);
         res.status(200).send({
             message: 'Success',
             status: res.status,
         });
     } catch(err) {
         res.status(404).send({
-            message: err,
+            message: 'Unable to add user',
             status: res.status
         });
-        throw new Error(err);
     }
   }
 

@@ -8,42 +8,41 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
-class AuthService {
-    verifyToken(token) {
+const database_1 = require("../config/database");
+class UserService {
+    getAll() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield jwt.verify(token, process.env.JWT_SECRET);
+                const response = yield database_1.db.query('select user_id, username, password, email from users');
+                return response.rows;
             }
             catch (err) {
                 throw new Error(err);
             }
         });
     }
-    createToken(details) {
+    getUserById(id) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (typeof details !== 'object') {
-                    details = {};
-                }
-                if (!details.maxAge || typeof details.maxAge !== 'number') {
-                    details.maxAge = 3600;
-                }
-                return yield jwt.sign({ data: details.sessionData }, process.env.JWT_SECRET, {
-                    expiresIn: details.maxAge,
-                    algorithm: 'HS256'
-                });
+                const response = yield database_1.db.query('select* from users where user_id = $1', [id]);
+                return response.rows[0];
             }
             catch (err) {
                 throw new Error(err);
             }
         });
     }
-    verifyPassword(password, passwordHash) {
+    addUser(username, password, email) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield bcrypt.compare(password, passwordHash);
+                const saltRounds = 10;
+                password = yield bcrypt.hash(password, saltRounds);
+                yield database_1.db.query(`insert into users (
+            username,
+            password,
+            email
+        ) values($1, $2, $3)`, [username, password, email]);
             }
             catch (err) {
                 throw new Error(err);
@@ -51,6 +50,6 @@ class AuthService {
         });
     }
 }
-exports.AuthService = AuthService;
-const authService = new AuthService();
-exports.default = authService;
+exports.UserService = UserService;
+const userService = new UserService();
+exports.default = userService;

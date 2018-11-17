@@ -1,4 +1,5 @@
 import * as jwt from 'jsonwebtoken';
+import * as bcrypt from 'bcrypt';
 
 interface Details {
   sessionData?: object;
@@ -7,11 +8,6 @@ interface Details {
 }
 
 export class AuthService {
-
-  constructor() {
-    process.env.JWT_SECRET = 'exaltedapisecret';
-  }
-
   public async verifyToken(token: string): Promise<string | object> {
     try {
       return await jwt.verify(token, process.env.JWT_SECRET);
@@ -43,6 +39,14 @@ export class AuthService {
     }
   }
 
+  public async verifyPassword(password: string, passwordHash: string): Promise<boolean> {
+    try {
+      return await bcrypt.compare(password, passwordHash);
+    } catch(err) {
+      throw new Error(err);
+    }
+  }
 }
 
-export default AuthService;
+const authService = new AuthService();
+export default authService;

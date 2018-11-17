@@ -9,8 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const bcrypt = require("bcrypt");
-const database_1 = require("../config/database");
+const users_1 = require("../services/users");
 class UserRouter {
     constructor() {
         this.router = express_1.Router();
@@ -19,16 +18,17 @@ class UserRouter {
     getAll(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.db.query('select* from users');
+                const response = yield users_1.default.getAll();
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
-                    users: response.rows
+                    users: response
                 });
             }
             catch (err) {
                 res.status(404).send({
-                    message: err,
+                    message: 'Somehting went wrong',
+                    error: err,
                     status: res.status
                 });
             }
@@ -37,16 +37,16 @@ class UserRouter {
     getUserById(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.db.query('select* from users where user_id = $1', [req.params.id]);
+                const response = yield users_1.default.getUserById(req.params.id);
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
-                    user: response.rows[0]
+                    user: response
                 });
             }
             catch (err) {
                 res.status(404).send({
-                    message: err,
+                    message: 'User not found',
                     status: res.status
                 });
             }
@@ -55,13 +55,7 @@ class UserRouter {
     addUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const saltRounds = 10;
-                req.body.password = yield bcrypt.hash(req.body.password, saltRounds);
-                yield database_1.db.query(`insert into users (
-            username,
-            password,
-            email
-        ) values($1, $2, $3)`, [req.body.username, req.body.password, req.body.email]);
+                yield users_1.default.addUser(req.body.username, req.body.password, req.body.email);
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
@@ -69,10 +63,9 @@ class UserRouter {
             }
             catch (err) {
                 res.status(404).send({
-                    message: err,
+                    message: 'Unable to add user',
                     status: res.status
                 });
-                throw new Error(err);
             }
         });
     }

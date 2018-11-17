@@ -9,26 +9,26 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const bcrypt = require("bcrypt");
 const database_1 = require("../config/database");
-const services_1 = require("../services");
+const auth_1 = require("../services/auth");
 class AuthRouter {
     constructor() {
         this.router = express_1.Router();
-        this.authService = new services_1.AuthService();
         this.init();
     }
     verifyJWTToken(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let token = (req.method === 'POST') ? req.body.token : req.query.token;
-                const decodedToken = yield this.authService.verifyToken(token);
-                req.user = decodedToken.data;
-                next();
+                yield auth_1.default.verifyToken(token);
+                res.status(200).send({
+                    success: true,
+                    data: req.user
+                });
             }
             catch (err) {
                 res.status(400).send({
-                    message: "auth.invalid"
+                    message: "Validation failed. Given email and password aren't matching."
                 });
             }
         });
@@ -37,12 +37,12 @@ class AuthRouter {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const response = yield database_1.db.query('select * from users where username = $1 or email = $2', [req.body.username, req.body.email]);
-                const passwordMatch = yield this.verifyPassword(req.body.password, response.rows[0].password);
+                const passwordMatch = yield auth_1.default.verifyPassword(req.body.password, response.rows[0].password);
                 if (passwordMatch) {
                     res.status(200).send({
                         message: 'Success',
                         status: res.status,
-                        token: this.authService.createToken({
+                        token: yield auth_1.default.createToken({
                             sessionData: response.rows[0],
                             maxAge: 3600
                         })
@@ -57,25 +57,15 @@ class AuthRouter {
             }
             catch (err) {
                 res.status(404).send({
-                    message: err,
+                    message: yield err,
                     status: res.status
                 });
             }
         });
     }
-    verifyPassword(password, passwordHash) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                return yield bcrypt.compare(password, passwordHash);
-            }
-            catch (err) {
-                throw new Error(err);
-            }
-        });
-    }
     init() {
-        this.router.post('/authenticate', this.verifyJWTToken);
         this.router.post('/login', this.login);
+        this.router.post('/authenticate', this.verifyJWTToken);
     }
 }
 exports.AuthRouter = AuthRouter;
