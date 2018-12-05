@@ -19,7 +19,7 @@ class AuthRouter {
     verifyJWTToken(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                let token = (req.method === 'POST') ? req.body.token : req.query.token;
+                let token = req.headers.token;
                 yield auth_1.default.verifyToken(token);
                 res.status(200).send({
                     success: true,
@@ -28,8 +28,9 @@ class AuthRouter {
             }
             catch (err) {
                 res.status(400).send({
-                    message: "Validation failed. Given email and password aren't matching."
+                    message: err
                 });
+                throw err;
             }
         });
     }
@@ -57,9 +58,10 @@ class AuthRouter {
             }
             catch (err) {
                 res.status(404).send({
-                    message: yield err,
+                    message: 'Login failed',
                     status: res.status
                 });
+                throw new Error(err);
             }
         });
     }

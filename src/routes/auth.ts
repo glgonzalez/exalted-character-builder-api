@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { db } from '../config/database';
 
 import authService from '../services/auth';
+import { access } from 'fs';
 
 export class AuthRouter {
   public router: Router;
@@ -14,7 +15,7 @@ export class AuthRouter {
 
   public async verifyJWTToken(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      let token = (req.method === 'POST') ? req.body.token : req.query.token
+      let token = req.headers.token;
       await authService.verifyToken(token);
       res.status(200).send({
         success: true,
@@ -22,8 +23,9 @@ export class AuthRouter {
       });
     } catch(err) {
       res.status(400).send({
-        message: "Validation failed. Given email and password aren't matching."
+        message: err
       });
+      throw err;
     }
   }
 
@@ -48,9 +50,10 @@ export class AuthRouter {
       }
     } catch(err) {
       res.status(404).send({
-        message: await err,
+        message: 'Login failed',
         status: res.status
       });
+      throw new Error(err);
     }
   }
 
