@@ -5,6 +5,7 @@ const logger = require("morgan");
 const bodyParser = require("body-parser");
 const session = require("express-session");
 const routes = require("./routes");
+const cors = require("cors");
 class App {
     constructor() {
         this.express = express();
@@ -15,6 +16,7 @@ class App {
         this.express.use(logger('dev'));
         this.express.use(bodyParser.json());
         this.express.use(bodyParser.urlencoded({ extended: false }));
+        this.express.use(cors({ origin: 'http://localhost:3000' }));
         this.express.set('trust proxy', 1);
         this.express.use(session({
             secret: 'exaltedapisecret',
