@@ -10,6 +10,11 @@ const server = http.createServer(App_1.default);
 server.listen(port);
 server.on('error', onError);
 server.on('listening', onListening);
+server.on('uncaughtException', function (err) {
+    console.error((new Date).toUTCString() + ' uncaughtException:', err.message);
+    console.error(err.stack);
+    process.exit(1);
+});
 function normalizePort(val) {
     let port = (typeof val === 'string') ? parseInt(val, 10) : val;
     if (isNaN(port))

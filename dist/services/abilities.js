@@ -8,35 +8,20 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const services_1 = require("../services");
-class CharmsRouter {
-    constructor() {
-        this.router = express_1.Router();
-        this.init();
-    }
-    getCharms(req, res, next) {
+const database_1 = require("../config/database");
+class AbilityService {
+    getAbilities() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield services_1.charmsService.getCharms();
-                res.status(200).send({
-                    status: res.status,
-                    charms: response
-                });
+                const response = yield database_1.db.query('select name, description from abilities');
+                return response;
             }
-            catch (err) {
-                res.status(404).send({
-                    message: err,
-                    status: res.status
-                });
+            catch (e) {
+                throw new Error(e);
             }
         });
     }
-    init() {
-        this.router.get('/', this.getCharms);
-    }
 }
-exports.CharmsRouter = CharmsRouter;
-const charmRoutes = new CharmsRouter();
-charmRoutes.init();
-exports.default = charmRoutes.router;
+exports.AbilityService = AbilityService;
+const abilityService = new AbilityService();
+exports.abilityService = abilityService;

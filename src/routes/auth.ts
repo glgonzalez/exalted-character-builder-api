@@ -1,9 +1,6 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import * as bcrypt from 'bcrypt';
 import { db } from '../config/database';
-
-import authService from '../services/auth';
-import { access } from 'fs';
+import { authService } from '../services/auth';
 
 export class AuthRouter {
   public router: Router;
@@ -31,20 +28,20 @@ export class AuthRouter {
 
   public async login(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
-      const response = await db.query('select * from users where username = $1 or email = $2', [req.body.username, req.body.email]);
+      const response = await authService.login(req.body.username ? req.body.username : req.body.email);
       const passwordMatch: boolean = await authService.verifyPassword(req.body.password, response.rows[0].password);
       if (passwordMatch) {
         res.status(200).send({
-          message: 'Success',
           status: res.status,
           token: await authService.createToken({
             sessionData: response.rows[0],
             maxAge: 3600
-          })
+          }),
+          user: response.rows[0]
         });
       } else {
         res.status(401).send({
-          message: "Validation failed. Given email and password aren't matching.",
+          message: "Validation failed. Given email, username, or password don't match.",
           status: res.status
         });
       }

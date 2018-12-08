@@ -1,5 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 import * as bcrypt from 'bcrypt';
+import { db } from '../config/database';
 
 interface Details {
   sessionData?: object;
@@ -46,7 +47,16 @@ export class AuthService {
       throw new Error(err);
     }
   }
+
+  public async login(param?: string) {
+    try {
+      const response = await db.query(`select user_id, username, password, email from users where username = $1 or email = $1`, [param]);
+      return response;
+    } catch(err) {
+      throw new Error(err);
+    }
+  }
 }
 
 const authService = new AuthService();
-export default authService;
+export { authService };

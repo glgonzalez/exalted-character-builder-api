@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { db } from '../config/database';
+import { intimacyService } from '../services';
 
 export class IntimacyRouter {
   router: Router
@@ -9,21 +9,19 @@ export class IntimacyRouter {
     this.init();
   }
 
-  public getIntimacyTypes(req: Request, res: Response, next: NextFunction): void {
-    db.query(`select intimacy_types.id, intimacy_types.type from intimacy_types`, (err, response) => {
-      if (response) {
-        res.status(200).send({
-          message: 'Success',
-          status: res.status,
-          types: response.rows
-        });
-      } else {
-        res.status(404).send({
-          message: err,
-          status: res.status
-        });
-      }
-    });
+  public async getIntimacyTypes(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const response = await intimacyService.getIntimacyTypes();
+      res.status(200).send({
+        status: res.status,
+        intimacy_types: response
+      });
+    } catch (err) {
+      res.status(404).send({
+        message: err,
+        status: res.status
+      });
+    }
   }
 
   init() {

@@ -9,7 +9,6 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const database_1 = require("../config/database");
 const auth_1 = require("../services/auth");
 class AuthRouter {
     constructor() {
@@ -20,7 +19,7 @@ class AuthRouter {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 let token = req.headers.token;
-                yield auth_1.default.verifyToken(token);
+                yield auth_1.authService.verifyToken(token);
                 res.status(200).send({
                     success: true,
                     data: req.user
@@ -37,21 +36,21 @@ class AuthRouter {
     login(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.db.query('select * from users where username = $1 or email = $2', [req.body.username, req.body.email]);
-                const passwordMatch = yield auth_1.default.verifyPassword(req.body.password, response.rows[0].password);
+                const response = yield auth_1.authService.login(req.body.username ? req.body.username : req.body.email);
+                const passwordMatch = yield auth_1.authService.verifyPassword(req.body.password, response.rows[0].password);
                 if (passwordMatch) {
                     res.status(200).send({
-                        message: 'Success',
                         status: res.status,
-                        token: yield auth_1.default.createToken({
+                        token: yield auth_1.authService.createToken({
                             sessionData: response.rows[0],
                             maxAge: 3600
-                        })
+                        }),
+                        user: response.rows[0]
                     });
                 }
                 else {
                     res.status(401).send({
-                        message: "Validation failed. Given email and password aren't matching.",
+                        message: "Validation failed. Given email, username, or password don't match.",
                         status: res.status
                     });
                 }

@@ -8,35 +8,19 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const express_1 = require("express");
-const services_1 = require("../services");
-class IntimacyRouter {
-    constructor() {
-        this.router = express_1.Router();
-        this.init();
-    }
-    getIntimacyTypes(req, res, next) {
+const database_1 = require("../config/database");
+class IntimacyService {
+    getIntimacyTypes() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield services_1.intimacyService.getIntimacyTypes();
-                res.status(200).send({
-                    status: res.status,
-                    intimacy_types: response
-                });
+                const response = yield database_1.db.query(`select intimacy_types.id, intimacy_types.type from intimacy_types`);
+                return response.rows;
             }
             catch (err) {
-                res.status(404).send({
-                    message: err,
-                    status: res.status
-                });
+                throw new Error(err);
             }
         });
     }
-    init() {
-        this.router.get('/types', this.getIntimacyTypes);
-    }
 }
-exports.IntimacyRouter = IntimacyRouter;
-const intimacyRoutes = new IntimacyRouter();
-intimacyRoutes.init();
-exports.default = intimacyRoutes.router;
+const intimacyService = new IntimacyService();
+exports.intimacyService = intimacyService;

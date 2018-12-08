@@ -1,8 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import * as bcrypt from 'bcrypt';
-import { db } from '../config/database';
-
-import userService from '../services/users';
+import { userService } from '../services';
 
 export class UserRouter {
   router: Router
@@ -16,7 +13,6 @@ export class UserRouter {
     try {
         const response = await userService.getAll();
         res.status(200).send({
-            message: 'Success',
             status: res.status,
             users: response
         });
@@ -33,7 +29,6 @@ export class UserRouter {
     try {
         const response = await userService.getUserById(req.params.id);
         res.status(200).send({
-            message: 'Success',
             status: res.status,
             user: response
         });

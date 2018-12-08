@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { db } from '../config/database';
+import { attributeService } from '../services';
 
 export class AttributeRouter {
   router: Router
@@ -9,39 +9,34 @@ export class AttributeRouter {
     this.init();
   }
 
-  public getAttributes(req: Request, res: Response, next: NextFunction) {
-    db.query(`select attributes.id, attributes.name, attributes.description, attribute_types.type 
-    from attributes inner join attribute_types on attributes.type_id = attribute_types.id`, (err, response) => {
-      if (response) {
-          res.status(200).send({
-            message: 'Success',
-            status: res.status,
-            attributes: response.rows
-          })
-      } else {
-        res.status(404).send({
-          message: err,
-          status: res.status
-        });
-      }
-    });
+  public async getAttributes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await attributeService.getAttributes();
+      res.status(200).send({
+        status: res.status,
+        attributes: response
+      })
+    } catch (err) {
+      res.status(404).send({
+        message: err,
+        status: res.status
+      });
+    }
   }
 
-  public getAttributeTypes(req: Request, res: Response, next: NextFunction) {
-    db.query('select * from attribute_types', (err, response) => {
-      if (response) {
-        res.status(200).send({
-          message: 'Success',
-          status: res.status,
-          attributes_types: response.rows
-        })
-      } else {
-        res.status(404).send({
-          message: err,
-          status: res.status
-        });
-      }
-    });
+  public async getAttributeTypes(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await attributeService.getAttributTypes();
+      res.status(200).send({
+        status: res.status,
+        attributes_types: response
+      });
+    } catch(err) {
+      res.status(404).send({
+        message: err,
+        status: res.status
+      });
+    }
   }
 
   init() {

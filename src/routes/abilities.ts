@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { db } from '../config/database';
+import { abilityService } from '../services';
 
 export class AbilitiesRouter {
   router: Router
@@ -9,21 +9,19 @@ export class AbilitiesRouter {
     this.init();
   }
 
-  public getAbilities(req: Request, res: Response, next: NextFunction) {
-    db.query('select * from abilities', (err, response) => {
-      if (response) {
-          res.status(200).send({
-            message: 'Success',
-            status: res.status,
-            abilities: response.rows
-          })
-      } else {
-        res.status(404).send({
-          message: err,
-          status: res.status
-        });
-      }
-    });
+  public async getAbilities(req: Request, res: Response, next: NextFunction) {
+    try {
+      const response = await abilityService.getAbilities();
+      res.status(200).send({
+        status: res.status,
+        abilities: response.rows
+      });
+    } catch(err) {
+      res.status(404).send({
+        message: err,
+        status: res.status
+      });
+    }
   }
 
   init() {

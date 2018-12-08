@@ -8,54 +8,39 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcrypt");
 const database_1 = require("../config/database");
-class AuthService {
-    verifyToken(token) {
+class EquipmentService {
+    getWeapons() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield jwt.verify(token, process.env.JWT_SECRET);
+                const response = yield database_1.db.query(`select weapons.name, weapons.accuracy, weapons.damage, weapons.defense, weapons.overwhelming, 
+      weapons.tag_ids, armor_weapon_types.type from weapons inner join armor_weapon_types 
+      on weapons.weapon_type_id = armor_weapon_types.id;`);
+                return response.rows;
             }
             catch (err) {
                 throw new Error(err);
             }
         });
     }
-    createToken(details) {
+    getArmor() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                if (typeof details !== 'object') {
-                    details = {};
-                }
-                if (!details.maxAge || typeof details.maxAge !== 'number') {
-                    details.maxAge = 3600;
-                }
-                return yield jwt.sign({ data: details.sessionData }, process.env.JWT_SECRET, {
-                    expiresIn: details.maxAge,
-                    algorithm: 'HS256'
-                });
+                const response = yield database_1.db.query(`select armor.name, armor.soak, armor.hardness, armor.mobility_penalty, 
+      armor.tag_ids, armor_weapon_types.type from armor inner join armor_weapon_types 
+      on armor.armor_type_id = armor_weapon_types.id;`);
+                return response.rows;
             }
             catch (err) {
                 throw new Error(err);
             }
         });
     }
-    verifyPassword(password, passwordHash) {
+    getTags() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                return yield bcrypt.compare(password, passwordHash);
-            }
-            catch (err) {
-                throw new Error(err);
-            }
-        });
-    }
-    login(param) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const response = yield database_1.db.query(`select user_id, username, password, email from users where username = $1 or email = $1`, [param]);
-                return response;
+                const response = yield database_1.db.query('select * from tags');
+                return response.rows;
             }
             catch (err) {
                 throw new Error(err);
@@ -63,6 +48,5 @@ class AuthService {
         });
     }
 }
-exports.AuthService = AuthService;
-const authService = new AuthService();
-exports.authService = authService;
+const equipmentService = new EquipmentService();
+exports.equipmentService = equipmentService;

@@ -1,5 +1,5 @@
 import { Router, Request, Response, NextFunction } from 'express';
-import { db } from '../config/database';
+import { meritService } from '../services';
 
 export class MeritRouter {
   router: Router
@@ -9,22 +9,19 @@ export class MeritRouter {
     this.init();
   }
 
-  public getMerits(req: Request, res: Response, next: NextFunction): void {
-    db.query(`select merits.name, merits.description, merits.cost, merit_types.type 
-    from merits inner join merit_types on merits.merit_type_id = merit_types.id;`, (err, response) => {
-      if (response) {
-        res.status(200).send({
-          message: 'Success',
-          status: res.status,
-          merits: response.rows
-        });
-      } else {
-        res.status(404).send({
-          message: err,
-          status: res.status
-        });
-      }
-    });
+  public async getMerits(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const response = await meritService.getMerits();
+      res.status(200).send({
+        status: res.status,
+        merits: response
+      });
+    } catch (err) {
+      res.status(404).send({
+        message: err,
+        status: res.status
+      });
+    }
   }
 
   init() {

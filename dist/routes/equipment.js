@@ -1,24 +1,30 @@
 "use strict";
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : new P(function (resolve) { resolve(result.value); }).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const database_1 = require("../config/database");
+const services_1 = require("../services");
 class EquipmentRouter {
     constructor() {
         this.router = express_1.Router();
         this.init();
     }
     getWeapons(req, res, next) {
-        database_1.db.query(`select weapons.name, weapons.accuracy, weapons.damage, weapons.defense, weapons.overwhelming, 
-    weapons.tag_ids, armor_weapon_types.type from weapons inner join armor_weapon_types 
-    on weapons.weapon_type_id = armor_weapon_types.id;`, (err, response) => {
-            if (response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield services_1.equipmentService.getWeapons();
                 res.status(200).send({
-                    message: 'Success',
                     status: res.status,
-                    weapons: response.rows
+                    weapons: response
                 });
             }
-            else {
+            catch (err) {
                 res.status(404).send({
                     message: err,
                     status: res.status
@@ -27,17 +33,15 @@ class EquipmentRouter {
         });
     }
     getArmor(req, res, next) {
-        database_1.db.query(`select armor.name, armor.soak, armor.hardness, armor.mobility_penalty, 
-    armor.tag_ids, armor_weapon_types.type from armor inner join armor_weapon_types 
-    on armor.armor_type_id = armor_weapon_types.id;`, (err, response) => {
-            if (response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield services_1.equipmentService.getArmor();
                 res.status(200).send({
-                    message: 'Success',
                     status: res.status,
-                    armor: response.rows
+                    armor: response
                 });
             }
-            else {
+            catch (err) {
                 res.status(404).send({
                     message: err,
                     status: res.status
@@ -46,15 +50,15 @@ class EquipmentRouter {
         });
     }
     getTags(req, res, next) {
-        database_1.db.query('select* from tags', (err, response) => {
-            if (response) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const response = yield services_1.equipmentService.getTags();
                 res.status(200).send({
-                    message: 'SUCCESS',
                     status: res.status,
-                    tags: response.rows
+                    tags: response
                 });
             }
-            else {
+            catch (err) {
                 res.status(404).send({
                     message: err,
                     status: res.status

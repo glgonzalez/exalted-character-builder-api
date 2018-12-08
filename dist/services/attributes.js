@@ -8,13 +8,13 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-const bcrypt = require("bcrypt");
 const database_1 = require("../config/database");
-class UserService {
-    getAll() {
+class AttributeService {
+    getAttributes() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.db.query('select user_id, username, password, email from users');
+                const response = yield database_1.db.query(`select attributes.id, attributes.name, attributes.description, attribute_types.type 
+      from attributes inner join attribute_types on attributes.type_id = attribute_types.id`);
                 return response.rows;
             }
             catch (err) {
@@ -22,27 +22,11 @@ class UserService {
             }
         });
     }
-    getUserById(id) {
+    getAttributTypes() {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield database_1.db.query('select* from users where user_id = $1', [id]);
-                return response.rows[0];
-            }
-            catch (err) {
-                throw new Error(err);
-            }
-        });
-    }
-    addUser(username, password, email) {
-        return __awaiter(this, void 0, void 0, function* () {
-            try {
-                const saltRounds = 10;
-                password = yield bcrypt.hash(password, saltRounds);
-                yield database_1.db.query(`insert into users (
-            username,
-            password,
-            email
-        ) values($1, $2, $3)`, [username, password, email]);
+                const response = yield database_1.db.query('select * from attribute_types');
+                return response.rows;
             }
             catch (err) {
                 throw new Error(err);
@@ -50,6 +34,6 @@ class UserService {
         });
     }
 }
-exports.UserService = UserService;
-const userService = new UserService();
-exports.userService = userService;
+exports.AttributeService = AttributeService;
+const attributeService = new AttributeService();
+exports.attributeService = attributeService;

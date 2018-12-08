@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
-const users_1 = require("../services/users");
+const services_1 = require("../services");
 class UserRouter {
     constructor() {
         this.router = express_1.Router();
@@ -18,9 +18,8 @@ class UserRouter {
     getAll(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield users_1.default.getAll();
+                const response = yield services_1.userService.getAll();
                 res.status(200).send({
-                    message: 'Success',
                     status: res.status,
                     users: response
                 });
@@ -37,9 +36,8 @@ class UserRouter {
     getUserById(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                const response = yield users_1.default.getUserById(req.params.id);
+                const response = yield services_1.userService.getUserById(req.params.id);
                 res.status(200).send({
-                    message: 'Success',
                     status: res.status,
                     user: response
                 });
@@ -55,7 +53,7 @@ class UserRouter {
     addUser(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
-                yield users_1.default.addUser(req.body.username, req.body.password, req.body.email);
+                yield services_1.userService.addUser(req.body.username, req.body.password, req.body.email);
                 res.status(200).send({
                     message: 'Success',
                     status: res.status,
